@@ -31,12 +31,13 @@ case "$file_path" in
       *.ts|*.tsx)
         cat <<'REMINDER'
 [MPA reminder] これからソースを書きます。constitution の意味的ルールを思い出してください:
-  - SR-1: 同じ機能が既にないか? まず公開 index.ts（Capability Map / 40-discovery.md）を引く。
-          迷ったら find-shared Skill で意味的類似を探す。新規作成はその後。
+  - SR-1: 新しい機能/関数を足すなら、同じものが既にないか公開 index.ts（Capability Map / 40-discovery.md）を引く。
+          迷ったら find-shared Skill で意味的類似を探す。(純粋な既存修正のみなら該当しない場合あり)
   - SR-2: このファイルの責務を「接続詞なしの一文」で言えるか?
   - SR-3: 共通化しようとしているなら「同じ理由で変わるか?」を問うたか?(偶然の一致は分離)
   - SR-4: domain/entities に HTTP/DB/FW の語彙を漏らしていないか?
-基準は constitution/20-semantic-rules.md。迷うなら書く前に確認を。
+どの SR が該当するかは作業 intent に応じて判断（この hook は一律のリマインダ）。基準は constitution/20-semantic-rules.md。
+まだ /mpa を起動していないなら、起動すると上記を対話で代行運転します。迷うなら書く前に確認を。
 REMINDER
         ;;
     esac
