@@ -194,4 +194,4 @@ SR セットは MPA の心臓であり、軽々に増減しない。増減する
   - [`../examples/anti-patterns/`](../examples/anti-patterns/) に違反見本（`SR-N-<name>.md`）＋ [`anti-patterns/README.md`](../examples/anti-patterns/README.md) の対応表の 1 行。
   - [`checklists/before-merge.md`](./checklists/before-merge.md) の `R-N`（レビュー側）。
   - [`checklists/before-writing.md`](./checklists/before-writing.md) の `STEP`（生成側）。
-- **撤去条件**: その SR が**機械検証可能になったら**、lint / dependency-cruiser（[`50-enforcement.md`](./50-enforcement.md) の **L3**）へ昇格させ、SR からは削除する。機械で縛れるものを意味判断に残さない（L3 が床、SR は網）。
+- **撤去条件**: その SR が**機械検証可能になったら**、lint / dependency-cruiser（[`50-enforcement.md`](./50-enforcement.md) の **L3**）へ昇格させ、SR からは削除する。機械で縛れるものを意味判断に残さない（L3 が土台、SR は網）。

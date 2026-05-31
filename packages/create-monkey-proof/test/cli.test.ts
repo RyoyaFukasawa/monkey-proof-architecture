@@ -101,7 +101,10 @@ test("run: claude+gemini を展開し、期待ファイルが揃う", async () =
     const expected = [
       "constitution/00-principles.md",
       ".claude/skills/mpa/SKILL.md",
+      ".claude/skills/mpa-doctor/SKILL.md",
       ".claude/commands/mpa-check.md",
+      ".claude/commands/mpa-doctor.md",
+      ".gemini/commands/mpa-doctor.toml",
       "CLAUDE.md",
       ".claude/hooks/bin/mpa-pre-write.sh",
       ".claude/settings.example.json",

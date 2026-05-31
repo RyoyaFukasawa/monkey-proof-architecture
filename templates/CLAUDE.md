@@ -22,7 +22,7 @@
 作業を始めるときは、まず **`/mpa`**（`.claude/skills/mpa/SKILL.md`）を叩くのが推奨入口。
 対話で「新規/修正/リファクタ」を聞き、Phase 0→3 を代行運転し、内部で `/mpa-check`・`/mpa-review`・`mpa-guard` を順に運転する。
 説明書を読まなくても、これと対話するだけで MPA の手順に沿って進められる。
-（叩かれなくても床は機能する：強制の床は L3=CI、気づきは L1/L2=hook。→ `50-enforcement.md`）
+（叩かれなくても土台は機能する：強制の土台は L3=CI、気づきは L1/L2=hook。→ `50-enforcement.md`）
 
 ### コードを書く前
 [`constitution/checklists/before-writing.md`](constitution/checklists/before-writing.md) を通すこと。
@@ -38,6 +38,8 @@
 - `/mpa` Skill（`.claude/skills/mpa/SKILL.md`）が**作業全体の案内人（オーケストレータ）**。下記を順に運転する。
 - `mpa-guard` Skill（`.claude/skills/mpa-guard/SKILL.md`）が生成時/レビュー時の SR 判定を担う**個別実行器**。
 - slash command: `/mpa-check`（書く前）、`/mpa-review`（マージ前）— `/mpa` が内部で呼ぶ**個別実行器**。
+- `/mpa-doctor`（`mpa-doctor` Skill）— **土台の点検**。L3（機械検証＝依存方向・命名・死コードの lint/CI）が
+  このリポジトリに導入されているかを診断する。SR ではなく「土台ができているか」を見る。導入直後や CI が不安なときに叩く。
 - これらは規約を**複製せず参照する**。判断基準は常に `constitution/` 側にある。
 
 ## してはいけないこと
