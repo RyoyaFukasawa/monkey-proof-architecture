@@ -1,11 +1,11 @@
-# create-mpa
+# create-monkey-proof
 
 **MPA (Monkey-Proof Architecture) を新規/既存プロジェクトに導入する CLI。**
 
 ```bash
-npm create mpa@latest
+npm create monkey-proof@latest
 # or
-npx create-mpa
+npx create-monkey-proof
 ```
 
 対話で「新規/既存」「使う AI ツール（Claude Code / Gemini CLI / Codex / 汎用）」を聞き、
@@ -15,21 +15,21 @@ npx create-mpa
 
 ## 設計：正本を複製せず「同梱したスナップショット」を配る（MPA P2）
 
-create-mpa の心臓は **「規約の文章を二重管理しない」**（MPA 原則 P2）こと。
+create-monkey-proof の心臓は **「規約の文章を二重管理しない」**（MPA 原則 P2）こと。
 
-- **唯一の正本は mpa リポジトリの [`constitution/`](../../constitution/) と [`templates/`](../../templates/) だけ。**
-- `create-mpa` は AI の記憶から規約を**再生成しない**。`build` 時に正本を `assets/` へコピーして同梱し、
+- **唯一の正本は monkey-proof-architecture リポジトリの [`constitution/`](../../constitution/) と [`templates/`](../../templates/) だけ。**
+- `create-monkey-proof` は AI の記憶から規約を**再生成しない**。`build` 時に正本を `assets/` へコピーして同梱し、
   実行時はその**実ファイル**をユーザーのプロジェクトへ配る。
 - npm に載るのは「ある時点の正本の影（スナップショット）」であって、手書きの複製ではない。
-  → ユーザーの `npx create-mpa` は**ネット越し clone 不要**（速い・本家 URL 固定の脆さがない）。
+  → ユーザーの `npx create-monkey-proof` は**ネット越し clone 不要**（速い・本家 URL 固定の脆さがない）。
 
 ```
-mpa repo (唯一の正本)
+monkey-proof-architecture repo (唯一の正本)
   constitution/  templates/
         │ build 時に copy-assets.mjs が取り込む（assets/ は .gitignore 済み）
         ▼
-  packages/create-mpa/assets/   ← publish に同梱されるスナップショット
-        │ npx create-mpa
+  packages/create-monkey-proof/assets/   ← publish に同梱されるスナップショット
+        │ npx create-monkey-proof
         ▼
   ユーザーのプロジェクト   .claude/ .gemini/ AGENTS.md … + constitution/
 ```

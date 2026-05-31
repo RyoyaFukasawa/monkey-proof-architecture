@@ -16,7 +16,7 @@
 | 目的 | 行き先 |
 |---|---|
 | 📖 **思想と規約を読みたい** | **[`constitution/`](constitution/README.md)** — 規約のすべてと地図 |
-| 📦 **自分のプロジェクトに導入したい** | `npx create-mpa`（[`packages/create-mpa/`](packages/create-mpa/)）— 対話で AI ツールへ `/mpa` 一式を展開 |
+| 📦 **自分のプロジェクトに導入したい** | `npx create-monkey-proof`（[`packages/create-monkey-proof/`](packages/create-monkey-proof/)）— 対話で AI ツールへ `/mpa` 一式を展開 |
 | 🧪 **規約が効いている実例を見たい** | **[`examples/`](examples/README.md)** — 「いいね」機能の reference 実装（web=FSD / api=CleanArch）と[アンチパターン](examples/anti-patterns/) |
 | 🛠 **MPA 自体を開発したい** | **[`CLAUDE.md`](CLAUDE.md)** — このリポジトリの開発者向け入口 |
 
@@ -24,7 +24,7 @@
 
 ## 導入したプロジェクトでの使い方
 
-`npx create-mpa` で導入すると、**作業の入口 `/mpa` が各 AI ツールに展開される。**
+`npx create-monkey-proof` で導入すると、**作業の入口 `/mpa` が各 AI ツールに展開される。**
 MPA を知らなくても、対話に答えるだけで規約に沿って実装/修正できる。
 
 | ツール | 起動 |
@@ -35,7 +35,7 @@ MPA を知らなくても、対話に答えるだけで規約に沿って実装/
 | その他（Cursor 等） | `AGENTS.md` を読むツールは、そこから同じ進行表へ案内される |
 
 > どのツール版も規約を複製せず、`constitution/` を参照する薄いブリッジ。
-> 正本（`constitution/` と `templates/`）を直したら `create-mpa` を publish し直すだけで全ツールへ反映される。
+> 正本（`constitution/` と `templates/`）を直したら `create-monkey-proof` を publish し直すだけで全ツールへ反映される。
 
 ---
 
@@ -46,6 +46,6 @@ constitution/          唯一の正本。規約の実体（読む人はここ）
 examples/
   ├── anti-patterns/     規約違反の見本（読み物）
   └── demo/              動くデモ = 規約が効いている証拠。CI の検証対象
-templates/             create-mpa が各プロジェクトに配る素材一式
-packages/create-mpa/   導入機構。npx create-mpa の実装
+templates/             create-monkey-proof が各プロジェクトに配る素材一式
+packages/create-monkey-proof/   導入機構。npx create-monkey-proof の実装
 ```

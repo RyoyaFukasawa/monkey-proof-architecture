@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * create-mpa — MPA を新規/既存プロジェクトに導入し、使う AI ツールへ /mpa 一式を展開する。
+ * create-monkey-proof — MPA を新規/既存プロジェクトに導入し、使う AI ツールへ /mpa 一式を展開する。
  *
  * 旧 `/mpa-init`（AI に手順を喋らせていた進行表）を、決定的なコードへ昇格したもの。
  * AI の記憶から規約を再生成せず、同梱した「正本のスナップショット」(assets/) を実ファイルとして配る。
@@ -93,7 +93,7 @@ async function run(_opts: Options): Promise<void> {
   //   - 生成ファイルが実在 / SKILL に name+description / hook の実行ビット / constitution 参照先が実在
   //
   // 出力: 配置・補完したファイル、衝突時の選択結果、各ツールでの /mpa 起動方法を報告
-  console.log("create-mpa (prototype)");
+  console.log("create-monkey-proof (prototype)");
   console.log("assets:", ASSETS_DIR);
   console.log("TODO: 対話フローと展開ロジックを実装する");
 }
