@@ -29,7 +29,7 @@
 
 ### L0. 対話オーケストレータ（`/mpa` Skill）— 任意の運転役
 
-- `.ai/skills/mpa/SKILL.md`（slash: `/mpa`）。
+- `templates/skills/mpa/SKILL.md`（slash: `/mpa`）。
 - **新たな強制層ではない**。ユーザーが叩いたとき、L1〜L4 の手順（生成時チェック・SR 判定・終了時レビュー）を
   **対話で順に運転する案内役**。中身は `/mpa-check`・`mpa-guard`・`/mpa-review` を呼ぶだけで、判断基準は持たない（P2）。
 - 叩かれなくても**床は従来どおり L3（CI）/ 気づきは L1/L2（hook）**。`/mpa` は床を上書きも代替もしない。
@@ -37,7 +37,7 @@
 
 ### L1. 生成時リマインド（PreToolUse hook）— 弱いが軽い
 
-- `.ai/hooks/bin/mpa-pre-write.sh`
+- `templates/hooks/bin/mpa-pre-write.sh`
 - Write/Edit で `apps/` `packages/` の `.ts(x)` を触る**直前**に、SR-1〜SR-4 を思い出させる。
 - **強制はしない**（ブロックしない）。コードを書く直前に「既存を探したか?」を確実に提示するだけ。
 - 対象外（md・設定・apps 外）では黙る。ノイズを出さない。
@@ -45,7 +45,7 @@
 
 ### L2. 終了時セルフレビュー（Stop hook / `/mpa-review`）— 書きっぱなし防止
 
-- `.ai/hooks/bin/mpa-stop-review.sh`
+- `templates/hooks/bin/mpa-stop-review.sh`
 - ターン終了時、この差分に `apps/` `packages/` の TS 変更があれば、
   `before-merge`（SR-1〜SR-4 の事後チェック）を促す。
 - 再帰防止（`stop_hook_active`）を実装済み。
@@ -169,8 +169,8 @@ NotFound / バリデーション / インフラ失敗も、文字列ではなく
 | application | 各ユースケースの**正常系 + 主要異常系**を in-memory repo + Fake Clock で |
 | web feature | 主要操作ロジック（**楽観的更新 + ロールバック**等） |
 
-> 書き方は reference 実装（`examples/README.md` が案内する `apps/`）の形に倣う（複製しない）。
-> 具体形：`apps/api/.../Post.test.ts`（domain）／`LikePostUseCase.test.ts`（application）／`apps/web/.../useLikePost.test.ts`（feature）。
+> 書き方は reference 実装（`examples/README.md` が案内する `examples/demo/src/apps/`）の形に倣う（複製しない）。
+> 具体形：`examples/demo/src/apps/api/.../Post.test.ts`（domain）／`LikePostUseCase.test.ts`（application）／`examples/demo/src/apps/web/.../useLikePost.test.ts`（feature）。
 
 ---
 

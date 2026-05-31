@@ -1,0 +1,35 @@
+{
+  "name": "create-mpa",
+  "version": "0.0.0",
+  "description": "MPA (Monkey-Proof Architecture) を新規/既存プロジェクトに導入し、使う AI ツールへ /mpa 一式を展開する。",
+  "type": "module",
+  "bin": {
+    "create-mpa": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "assets"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs",
+    "dev": "node --loader tsx src/cli.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mpa",
+    "monkey-proof-architecture",
+    "architecture",
+    "fsd",
+    "clean-architecture",
+    "scaffolding",
+    "ai-agents"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "tsx": "^4.0.0",
+    "typescript": "^5.4.0"
+  }
+}

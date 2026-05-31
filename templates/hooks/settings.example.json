@@ -8,7 +8,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.ai/hooks/bin/mpa-pre-write.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/bin/mpa-pre-write.sh"
           }
         ]
       }
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.ai/hooks/bin/mpa-stop-review.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/bin/mpa-stop-review.sh"
           }
         ]
       }
