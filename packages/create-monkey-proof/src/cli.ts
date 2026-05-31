@@ -15,7 +15,7 @@
  */
 
 import { cp, mkdir, stat, chmod, readFile, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, realpathSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -349,9 +349,28 @@ function main(): void {
   });
 }
 
-// 直接実行（node dist/cli.js / npx）された時だけ main を走らせる。
-// import 経由（テスト）では実行されない。
-if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+/**
+ * このファイルが「CLI として直接実行された」かを判定する。
+ *
+ * npx / グローバル install では node_modules/.bin/create-monkey-proof という
+ * symlink 経由で起動され、process.argv[1] は symlink のパスになる。
+ * 一方 import.meta.url は実体（dist/cli.js）を指す。
+ * 単純比較だと両者が一致せず main() が呼ばれない（= 無言で終了するバグ）。
+ * そこで argv[1] を realpath で解決してから比較する。
+ */
+function isMainModule(): boolean {
+  const entry = process.argv[1];
+  if (!entry) return false;
+  const self = fileURLToPath(import.meta.url);
+  try {
+    return self === realpathSync(entry);
+  } catch {
+    // entry が解決できない場合は素の resolve でフォールバック
+    return self === resolve(entry);
+  }
+}
+
+if (isMainModule()) {
   main();
 }
 
