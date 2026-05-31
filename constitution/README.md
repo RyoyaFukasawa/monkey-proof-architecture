@@ -47,7 +47,7 @@ lint では原理的に判定できない 4 つを、AI が生成時とレビュ
 
 ## ツール（`templates/`）
 
-> これらは `templates/` に正本があり、`npx create-mpa`（[`packages/create-mpa/`](../packages/create-mpa/)）が各 AI ツール用のブリッジ（`.claude/` 等）を生成する。
+> これらは `templates/` に正本があり、`npx create-monkey-proof`（[`packages/create-monkey-proof/`](../packages/create-monkey-proof/)）が各 AI ツール用のブリッジ（`.claude/` 等）を生成する。
 
 | | 役割 |
 |---|---|
@@ -66,7 +66,7 @@ examples/                # 規約を言葉で示す補助（reference の歩き�
   demo/src/apps/web      #   FSD の reference（「いいね」機能の縦串）
   demo/src/apps/api      #   Clean Architecture × DDD の reference（同じ「いいね」を同心円で）
   demo/src/packages/types #  reference の apps 間で共有する契約型
-templates/               # Skill / command / hook の正本（create-mpa が各ツールへ展開）
-packages/create-mpa/     # 導入機構（npx create-mpa）
+templates/               # Skill / command / hook の正本（create-monkey-proof が各ツールへ展開）
+packages/create-monkey-proof/     # 導入機構（npx create-monkey-proof）
 CLAUDE.md                # AI 向けの薄い入口
 ```

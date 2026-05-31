@@ -1,5 +1,5 @@
 {
-  "//": "create-mpa が templates/hooks/settings.example.json から生成。MPA hooks の登録。",
+  "//": "create-monkey-proof が templates/hooks/settings.example.json から生成。MPA hooks の登録。",
   "hooks": {
     "PreToolUse": [
       {

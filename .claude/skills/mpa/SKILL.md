@@ -5,10 +5,10 @@ description: MPA リポジトリで作業を始めるときの推奨入口。叩
 
 # mpa（Claude Code 版ブリッジ）
 
-> このファイルは `npx create-mpa` が**正本から生成したブリッジ**。進行表の実体はコピーしない（腐るため）。
+> このファイルは `npx create-monkey-proof` が**正本から生成したブリッジ**。進行表の実体はコピーしない（腐るため）。
 > 正本: [`templates/skills/mpa/SKILL.md`](../../../templates/skills/mpa/SKILL.md) ／ 規約: [`constitution/`](../../../constitution/README.md)
 
 **やること**: 正本 [`templates/skills/mpa/SKILL.md`](../../../templates/skills/mpa/SKILL.md) を読み、その進行表（Phase 0→3）に**厳密に従って**、
 ユーザーと対話しながら実装/修正まで案内する。判断基準は [`constitution/`](../../../constitution/README.md) を読んで適用する（複製しない）。
 
-正本が更新されたら `npx create-mpa` を再実行すればこのブリッジも更新される。
+正本が更新されたら `npx create-monkey-proof` を再実行すればこのブリッジも更新される。

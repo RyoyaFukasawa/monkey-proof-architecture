@@ -5,7 +5,7 @@ description: MPA (Monkey-Proof Architecture) の意味的ルール SR-1〜SR-4 �
 
 # mpa-guard（Claude Code 版ブリッジ）
 
-> このファイルは `npx create-mpa` が**正本から生成したブリッジ**。判定基準も手順もコピーしない（腐るため）。
+> このファイルは `npx create-monkey-proof` が**正本から生成したブリッジ**。判定基準も手順もコピーしない（腐るため）。
 > 正本: [`templates/skills/mpa-guard/SKILL.md`](../../../templates/skills/mpa-guard/SKILL.md) ／ 規約: [`constitution/`](../../../constitution/README.md)
 
 **やること**: 正本 [`templates/skills/mpa-guard/SKILL.md`](../../../templates/skills/mpa-guard/SKILL.md) を読み、その手順で SR-1〜SR-4 を判定する。

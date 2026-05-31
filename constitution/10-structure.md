@@ -19,7 +19,7 @@ repo-root/
 │   ├── ui/                #   複数 app 共有のデザインシステム（ドメイン知識ゼロ）
 │   └── config/            #   tsconfig / eslint / etc
 ├── CLAUDE.md              # → constitution/ を読めと指示するだけ
-└── .claude/ .gemini/ …    # create-mpa が生成する AI ツール用ブリッジ（/mpa 一式・hook）
+└── .claude/ .gemini/ …    # create-monkey-proof が生成する AI ツール用ブリッジ（/mpa 一式・hook）
 ```
 
 > **判断: `packages/ui` か `apps/web/src/shared/ui` か** — 複数 app（web と将来の admin 等）で共有する UI → `packages/ui`。その app 内だけで使う土台 → `apps/web/src/shared/ui`。app が web 1 つだけの現状は `shared/ui` に置く（だから reference の Button は `shared/ui` にある）。
