@@ -57,6 +57,8 @@
 
 - FSD 依存方向・slice deep import 禁止・命名 → eslint（→ 10-structure / 30-naming）。
 - CleanArch 依存方向（domain 何にも依存しない）→ dependency-cruiser。
+- **死コード（未使用 export・到達不能ファイル）→ knip / ts-prune**。「誰からも import されていない公開シンボル」「孤児の実装」「連動して死んだ下位」は静的解析で網羅でき、**意味判断を要さない**ので機械の床に乗せる（消し残しが [`40-discovery.md`](./40-discovery.md) の Capability Map を汚すのを物理的に防ぐ）。
+  - **but**: knip は**動的参照（`require(変数)`・リフレクション）・外部公開 API・設定/DI 経由の参照を "未使用" と誤検出する**。機械が「未使用」と言っても、これらの疑いがあるものは消さず人間に確認する。ここだけは意味判断（機械の指摘を鵜呑みにしない歯止め）。
 - **これらは P3 の領域**（機械で縛れるもの）。AI も人間も判断しない。導入後は**通らなければマージできない**。
 - 設定例は本ファイル末尾（reference にはランナー一式は同梱しない。下記の但し書き参照）。
 
@@ -144,6 +146,7 @@ jobs:
     steps:
       - run: pnpm -r lint                       # L3: FSD/命名
       - run: pnpm --filter api depcruise        # L3: CleanArch 依存方向
+      - run: pnpm -r knip                        # L3: 死コード（未使用 export・到達不能）
       - run: pnpm -r test                       # 同梱テスト
 ```
 
