@@ -93,9 +93,10 @@ async function run(_opts: Options): Promise<void> {
   //   - 生成ファイルが実在 / SKILL に name+description / hook の実行ビット / constitution 参照先が実在
   //
   // 出力: 配置・補完したファイル、衝突時の選択結果、各ツールでの /mpa 起動方法を報告
-  console.log("create-monkey-proof (prototype)");
-  console.log("assets:", ASSETS_DIR);
-  console.log("TODO: 対話フローと展開ロジックを実装する");
+  console.log("create-monkey-proof — この名前は予約済みです（実装は準備中）。");
+  console.log("");
+  console.log("Monkey-Proof Architecture (MPA) の導入 CLI は現在開発中です。");
+  console.log("最新情報: https://github.com/RyoyaFukasawa/monkey-proof-architecture");
 }
 
 // エントリポイント（引数パースは今後 prompts/clack 等で対話化）
