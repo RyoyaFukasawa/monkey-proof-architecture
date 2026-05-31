@@ -1,47 +1,43 @@
-# CLAUDE.md
+# CLAUDE.md — mpa リポジトリ開発者向け
 
-> このファイルは **薄い入口** です。規約の実体は持ちません（MPA 原則 P2）。
+> これは **MPA という作品を開発する** ための入口です（このリポジトリ自身で作業する AI / 人間向け）。
+> MPA を**自分のプロジェクトに導入したい人**は、ここではなく `npx create-mpa`（[`packages/create-mpa/`](packages/create-mpa/)）を使ってください。
 
-## 最初に読むこと
+## このリポジトリの構造（3つの顔）
 
-このリポジトリのアーキテクチャ規約は **`constitution/`** に集約されています。
-人間も AI も、**同じこの規約**を読みます（人間用とAI用を分けない）。
+```
+mpa/
+├── constitution/          ★ 唯一の正本。規約の実体（P2 の心臓）。ここだけが真実。
+├── examples/
+│   ├── anti-patterns/       規約違反の見本（読み物）
+│   └── demo/                動くデモ = 規約が効いている証拠。CI の検証対象。
+├── templates/             ★ create-mpa が各プロジェクトに配る素材一式
+│   ├── CLAUDE.md GEMINI.md AGENTS.md   ユーザープロジェクトに置かれる入口の雛形
+│   ├── skills/ commands/ hooks/        各 AI ツールへ展開される進行表・SR 判定器
+└── packages/create-mpa/   ★ 導入機構。npx create-mpa の実装。
+                              同一 repo 内の constitution/ + templates/ を直接参照して配る。
+```
 
-**コードを読む / 書く / レビューする前に、必ず以下を読んでください：**
+- **正本は `constitution/` ただ1つ。** templates/ も create-mpa も demo も、規約の文章を**複製せず参照**する（P2）。
+- **`templates/CLAUDE.md` と この `CLAUDE.md` は別物。** 前者は「ユーザーに配る入口」、後者は「mpa を開発する入口」。混同しない。
 
-1. [`constitution/00-principles.md`](constitution/00-principles.md) — なぜこの構造か（MPA の 4 原則）
-2. [`constitution/10-structure.md`](constitution/10-structure.md) — FSD / CleanArch の配置ルール
-3. [`constitution/20-semantic-rules.md`](constitution/20-semantic-rules.md) — **機械で縛れないルール（MPA の心臓）**
-4. [`constitution/30-naming.md`](constitution/30-naming.md) — 命名規約
-5. [`constitution/40-discovery.md`](constitution/40-discovery.md) — 既存機能の探し方（SR-1 を実際に効かせる仕組み）
-6. [`constitution/50-enforcement.md`](constitution/50-enforcement.md) — ルールの強制方法（多層防御・hook・機械検証）
+## 開発時の約束
 
-## 振る舞いの指示
+- **規約の文章を `constitution/` の外に複製しない。** templates/・create-mpa・demo はすべて参照に徹する（P2）。
+- **create-mpa は `constitution/` と `templates/` を実ファイルとして読んで配る。** AI の記憶から規約を再生成しない（P2 違反になる）。
+- **templates/ を編集したら、それが各ツール版（`.claude/` `.gemini/` `.agents/`）へどう展開されるかを create-mpa 側と整合させる。**
+- **demo を変更したら CI（構造 lint ＋ `/mpa-review`）が通ることを確認する。** demo は配布物の品質を保証するドッグフーディングの場。
 
-### まず迷ったら `/mpa`
-作業を始めるときは、まず **`/mpa`**（[`.ai/skills/mpa/SKILL.md`](.ai/skills/mpa/SKILL.md)）を叩くのが推奨入口。
-対話で「新規/修正/リファクタ」を聞き、Phase 0→3 を代行運転し、内部で `/mpa-check`・`/mpa-review`・`mpa-guard` を順に運転する。
-説明書を読まなくても、これと対話するだけで MPA の手順に沿って進められる。
-（叩かれなくても床は機能する：強制の床は L3=CI、気づきは L1/L2=hook。→ `50-enforcement.md`）
+## このリポジトリ自身も MPA で開発する（ドッグフーディング）
 
-### コードを書く前
-[`constitution/checklists/before-writing.md`](constitution/checklists/before-writing.md) を通すこと。
-特に **SR-1（同じ機能を二度作らない）** を必ず確認する。
-書く前に [`constitution/40-discovery.md`](constitution/40-discovery.md) の手順で既存を探す
-（Capability Map = 公開 `index.ts` ＋ `shared`/`application/shared` の直走査 を引き、必要なら `find-shared` Skill で意味的類似を拾う）。
+mpa repo で実装作業をするときは、配布しているのと同じ手順に従う：
 
-### コードをレビューするとき
-[`constitution/checklists/before-merge.md`](constitution/checklists/before-merge.md) を通すこと。
-**根拠なき指摘をしない。グレーは断定せず人間に委ねる。**
-
-### 実行支援
-- `/mpa` Skill（[`.ai/skills/mpa/SKILL.md`](.ai/skills/mpa/SKILL.md)）が**作業全体の案内人（オーケストレータ）**。下記を順に運転する。
-- `mpa-guard` Skill（[`.ai/skills/mpa-guard/SKILL.md`](.ai/skills/mpa-guard/SKILL.md)）が生成時/レビュー時の SR 判定を担う**個別実行器**。
-- slash command: `/mpa-check`（書く前）、`/mpa-review`（マージ前）— `/mpa` が内部で呼ぶ**個別実行器**。
-- これらは規約を**複製せず参照する**。判断基準は常に `constitution/` 側にある。
+- 作業の入口は **`/mpa`**（`.claude/skills/mpa/SKILL.md`。templates/ から生成されたブリッジ）。
+- 規約は [`constitution/README.md`](constitution/README.md) から読む。
+- SR 判定は `/mpa-check`（書く前）・`/mpa-review`（マージ前）。
 
 ## してはいけないこと
 
-- 規約をこのファイルや Skill に**コピーしない**。常に `constitution/` を**参照**する。
+- 規約をこのファイルや templates/ や create-mpa に**コピーしない**。常に `constitution/` を**参照**する。
 - 機械で縛れるルール（依存方向・命名）を AI が再判定しない。lint の結果を信頼する。
-- 「迷ったまま書く」をしない。配置に迷ったら `10-structure.md` を読み、それでも迷えば人間に聞く。
+- 「迷ったまま書く」をしない。配置に迷ったら [`constitution/10-structure.md`](constitution/10-structure.md) を読む。

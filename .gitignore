@@ -1,4 +1,7 @@
 .DS_Store
 node_modules/
 *.log
-.claude/
+
+# Claude Code のセッション作業ファイルは無視（ブリッジ .claude/skills 等はコミットする）
+.claude/scheduled_tasks.lock
+.claude/*.lock

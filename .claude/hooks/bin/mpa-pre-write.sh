@@ -11,7 +11,7 @@
 #   - exit 0 + stdout: そのまま続行（stdout は AI への追加コンテキストになる）
 #   - exit 2: ブロック（ここでは使わない。MPA は「気づき」を与えるだけで強制しない）
 #
-# settings.json での登録例は .ai/hooks/settings.example.json を参照。
+# settings.json での登録例は .claude/hooks/settings.example.json を参照。
 
 set -euo pipefail
 

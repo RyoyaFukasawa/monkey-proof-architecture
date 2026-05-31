@@ -1,8 +1,10 @@
 # Examples — reference 実装の歩き方
 
 > MPA の規約（`constitution/`）を**動く形**で示す reference 実装の歩き方ガイド。
-> 実装本体はリポジトリ直下の **`apps/web`**・**`apps/api`** にある（このディレクトリはその案内）。
-> AI はこのガイドを入口に、`apps/` の reference 実装を「真似る対象（規範）」として読む。人間はオンボーディングで読む。
+> 実装本体は **`demo/src/apps/web`**・**`demo/src/apps/api`** にある（このディレクトリはその案内）。
+> AI はこのガイドを入口に、`demo/src/apps/` の reference 実装を「真似る対象（規範）」として読む。人間はオンボーディングで読む。
+>
+> この `demo/` は「規約が効いている証拠」であり、CI で構造規約（lint）と意味規約（`/mpa-review`）を回す検証対象でもある。
 
 題材は **「投稿にいいねする」機能**。web（FSD）と api（CleanArch×DDD）で 1 本ずつ、
 同じ機能をそれぞれのアーキテクチャで実装している。

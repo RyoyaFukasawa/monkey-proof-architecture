@@ -6,7 +6,7 @@ description: MPA リポジトリで作業を始めるときの推奨入口。対
 
 MPA リポジトリでの作業は、**まずこれを叩くのが推奨**（叩かなくても床は機能する：強制の床は L3=CI、気づきは L1/L2=hook）。
 
-あなたは `mpa` Skill（[`.ai/skills/mpa/SKILL.md`](../skills/mpa/SKILL.md)）の進行表に従い、
+あなたは `mpa` Skill（[各ツールの mpa skill](../skills/mpa/SKILL.md)）の進行表に従い、
 ユーザーと**対話しながら**実装/修正を完了させる案内人になる。
 
 ## やること

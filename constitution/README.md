@@ -4,7 +4,7 @@
 README・CLAUDE.md・Skill・command はすべてここを**参照**し、複製しない（MPA 原則 P2）。
 人間も AI も、同じこの規約を読む。
 
-> 入口は [`/mpa`](../.ai/skills/mpa/SKILL.md)。叩いて対話すれば、以下を読まなくても規約に沿って実装/修正できる。
+> 入口は [`/mpa`](../templates/skills/mpa/SKILL.md)。叩いて対話すれば、以下を読まなくても規約に沿って実装/修正できる。
 > このページは「仕組みを知りたくなった人」のための地図。
 
 ---
@@ -40,17 +40,19 @@ lint では原理的に判定できない 4 つを、AI が生成時とレビュ
 
 ## 手を動かして学ぶ
 
-[`examples/README.md`](../examples/README.md) の歩き方に沿って、`apps/` の「いいね」機能の reference 実装
+[`examples/README.md`](../examples/README.md) の歩き方に沿って、`examples/demo/src/apps/` の「いいね」機能の reference 実装
 （web=FSD / api=CleanArch の対比）と [`examples/anti-patterns/`](../examples/anti-patterns/) の違反見本を対で読む。
 
 ---
 
-## ツール（`.ai/`）
+## ツール（`templates/`）
+
+> これらは `templates/` に正本があり、`npx create-mpa`（[`packages/create-mpa/`](../packages/create-mpa/)）が各 AI ツール用のブリッジ（`.claude/` 等）を生成する。
 
 | | 役割 |
 |---|---|
-| [`/mpa`](../.ai/skills/mpa/SKILL.md) | 作業の入口。対話オーケストレータ（下記を順に運転する） |
-| [`mpa-guard`](../.ai/skills/mpa-guard/SKILL.md) | SR-1〜4 の判定実行器 |
+| [`/mpa`](../templates/skills/mpa/SKILL.md) | 作業の入口。対話オーケストレータ（下記を順に運転する） |
+| [`mpa-guard`](../templates/skills/mpa-guard/SKILL.md) | SR-1〜4 の判定実行器 |
 | `/mpa-check` / `/mpa-review` | 生成時チェック / レビュー時チェック（`/mpa` が内部で呼ぶ） |
 | hook | 書く直前のリマインド / 書きっぱなし防止（多層防御の L1/L2 → [50-enforcement](50-enforcement.md)） |
 
@@ -59,11 +61,12 @@ lint では原理的に判定できない 4 つを、AI が生成時とレビュ
 ## ディレクトリ
 
 ```
-constitution/        # 規約の本体（このページがその目次）
-apps/web             # FSD の reference（「いいね」機能の縦串）
-apps/api             # Clean Architecture × DDD の reference（同じ「いいね」を同心円で）
-packages/            # apps 間で共有する層（types / ui / config）
-examples/            # 規約を言葉で示す補助（reference の歩き方・違反見本）
-CLAUDE.md            # AI 向けの薄い入口
-.ai/                 # Skill / command / hook
+constitution/            # 規約の本体（このページがその目次）
+examples/                # 規約を言葉で示す補助（reference の歩き方・違反見本）
+  demo/src/apps/web      #   FSD の reference（「いいね」機能の縦串）
+  demo/src/apps/api      #   Clean Architecture × DDD の reference（同じ「いいね」を同心円で）
+  demo/src/packages/types #  reference の apps 間で共有する契約型
+templates/               # Skill / command / hook の正本（create-mpa が各ツールへ展開）
+packages/create-mpa/     # 導入機構（npx create-mpa）
+CLAUDE.md                # AI 向けの薄い入口
 ```

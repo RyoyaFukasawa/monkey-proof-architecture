@@ -19,7 +19,7 @@ repo-root/
 │   ├── ui/                #   複数 app 共有のデザインシステム（ドメイン知識ゼロ）
 │   └── config/            #   tsconfig / eslint / etc
 ├── CLAUDE.md              # → constitution/ を読めと指示するだけ
-└── .ai/                   # Skill / command / hook
+└── .claude/ .gemini/ …    # create-mpa が生成する AI ツール用ブリッジ（/mpa 一式・hook）
 ```
 
 > **判断: `packages/ui` か `apps/web/src/shared/ui` か** — 複数 app（web と将来の admin 等）で共有する UI → `packages/ui`。その app 内だけで使う土台 → `apps/web/src/shared/ui`。app が web 1 つだけの現状は `shared/ui` に置く（だから reference の Button は `shared/ui` にある）。
@@ -151,7 +151,7 @@ presentation/
 └── dto/LikePostRequest.ts
 ```
 
-> ※ 図中の `PrismaPostRepository.ts` は本番想定の例示。reference 実装（`apps/api`）では interface を `InMemoryPostRepository.ts` で実装し、`main.ts` で「本番は `PrismaPostRepository` に差し替え」と明示している（依存性逆転の成果）。
+> ※ 図中の `PrismaPostRepository.ts` は本番想定の例示。reference 実装（`examples/demo/src/apps/api`）では interface を `InMemoryPostRepository.ts` で実装し、`main.ts` で「本番は `PrismaPostRepository` に差し替え」と明示している（依存性逆転の成果）。
 
 ### レイヤー越えの語彙汚染（SR-4 の対象）
 
