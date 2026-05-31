@@ -13,6 +13,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs",
     "dev": "node --loader tsx src/cli.ts",
+    "pretest": "npm run build",
+    "test": "node --import tsx --test test/*.test.ts",
     "prepublishOnly": "npm run build"
   },
   "engines": {
