@@ -36,8 +36,8 @@ const ALL_TOOLS: Tool[] = ["claude", "gemini", "codex", "generic"];
  * 規約の実体は複製せず、各ブリッジは constitution/ を参照する薄い1枚にする（P2）。
  *
  * 正本側:
- *   assets/templates/skills/{mpa,mpa-guard}/SKILL.md
- *   assets/templates/commands/{mpa,mpa-check,mpa-review}.md
+ *   assets/templates/skills/{mpa,mpa-guard,mpa-doctor}/SKILL.md
+ *   assets/templates/commands/{mpa,mpa-check,mpa-review,mpa-doctor}.md
  *   assets/templates/hooks/{bin/*.sh, settings.example.json}
  *   assets/templates/{CLAUDE.md,GEMINI.md,AGENTS.md}
  *   assets/constitution/**            （規約の実体。そのまま配置）
@@ -46,8 +46,10 @@ const BRIDGE_MAP: Record<Tool, { from: string; to: string }[]> = {
   claude: [
     { from: "templates/skills/mpa/SKILL.md", to: ".claude/skills/mpa/SKILL.md" },
     { from: "templates/skills/mpa-guard/SKILL.md", to: ".claude/skills/mpa-guard/SKILL.md" },
+    { from: "templates/skills/mpa-doctor/SKILL.md", to: ".claude/skills/mpa-doctor/SKILL.md" },
     { from: "templates/commands/mpa-check.md", to: ".claude/commands/mpa-check.md" },
     { from: "templates/commands/mpa-review.md", to: ".claude/commands/mpa-review.md" },
+    { from: "templates/commands/mpa-doctor.md", to: ".claude/commands/mpa-doctor.md" },
     { from: "templates/CLAUDE.md", to: "CLAUDE.md" },
     { from: "templates/hooks/bin/mpa-pre-write.sh", to: ".claude/hooks/bin/mpa-pre-write.sh" },
     { from: "templates/hooks/bin/mpa-stop-review.sh", to: ".claude/hooks/bin/mpa-stop-review.sh" },
@@ -59,11 +61,13 @@ const BRIDGE_MAP: Record<Tool, { from: string; to: string }[]> = {
     { from: "templates/commands/mpa.md", to: ".gemini/commands/mpa.toml" }, // md→toml 変換
     { from: "templates/commands/mpa-check.md", to: ".gemini/commands/mpa-check.toml" },
     { from: "templates/commands/mpa-review.md", to: ".gemini/commands/mpa-review.toml" },
+    { from: "templates/commands/mpa-doctor.md", to: ".gemini/commands/mpa-doctor.toml" },
     { from: "templates/GEMINI.md", to: "GEMINI.md" },
   ],
   codex: [
     { from: "templates/skills/mpa/SKILL.md", to: ".agents/skills/mpa/SKILL.md" },
     { from: "templates/skills/mpa-guard/SKILL.md", to: ".agents/skills/mpa-guard/SKILL.md" },
+    { from: "templates/skills/mpa-doctor/SKILL.md", to: ".agents/skills/mpa-doctor/SKILL.md" },
     { from: "templates/AGENTS.md", to: "AGENTS.md" },
   ],
   generic: [
