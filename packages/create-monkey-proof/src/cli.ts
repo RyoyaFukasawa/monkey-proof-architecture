@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 /**
- * create-monkey-proof — MPA を新規/既存プロジェクトに導入し、使う AI ツールへ /mpa 一式を展開する。
+ * create-monkey-proof — MPA をプロジェクトに導入し、各 AI ツールへ仕様作成スキル一式を展開する。
  *
- * 旧 `/mpa-init`（AI に手順を喋らせていた進行表）を、決定的なコードへ昇格したもの。
- * AI の記憶から規約を再生成せず、同梱した「正本のスナップショット」(assets/) を実ファイルとして配る。
- * これ自体が MPA P2「複製しない／正本を参照する」の実践。
+ * このパッケージは MPA を **プロジェクト進行のフレーム** として配るためのもの。
+ * 配るのは「思想（docs/concepts/）」「進行フェーズの素材（templates/）」「機械検証の workflow」など。
+ * AI に規約や思想を記憶から再生させず、同梱した正本のスナップショット（assets/）を実ファイルとして配る。
+ * これ自体が原則 P1「原本は一つ・参照する・複製しない」の実践。
  *
- * この版は「最小・新規導入が確実に動く」スコープ：
+ * 現時点のスコープ（最小化中）:
  *   - 引数フラグで target / tools / dir を指定（対話 UI は今後）
- *   - BRIDGE_MAP + CONSTITUTION に沿って assets/ を実ファイルとして配置
- *   - 既存ファイルは上書きせずスキップして報告（衝突解決の対話は今後）
- *   - hooks/bin/*.sh は実行ビット 0755 を維持
- *   - 最後に sanity check して、配置結果と各ツールでの /mpa 起動方法を報告
+ *   - 思想（docs/concepts/）と spec 雛形・CI ワークフローを全プロジェクトに配置
+ *   - Claude / Codex 向けに mpa-spec スキルを展開
+ *   - Gemini / Generic 向けの入口は今後
+ *   - 既存ファイルは上書きせずスキップして報告
+ *   - 最後に sanity check して配置結果を報告
  */
 
 import { cp, mkdir, stat, chmod, readFile, writeFile } from "node:fs/promises";
@@ -33,52 +35,61 @@ const ALL_TOOLS: Tool[] = ["claude", "gemini", "codex", "generic"];
 
 /**
  * 正本（assets/）→ 各ツールの正規パスへの展開マップ。
- * 規約の実体は複製せず、各ブリッジは constitution/ を参照する薄い1枚にする（P2）。
  *
- * 正本側:
- *   assets/templates/skills/{mpa,mpa-guard}/SKILL.md
- *   assets/templates/commands/{mpa,mpa-check,mpa-review}.md
- *   assets/templates/hooks/{bin/*.sh, settings.example.json}
- *   assets/templates/{CLAUDE.md,GEMINI.md,AGENTS.md}
- *   assets/constitution/**            （規約の実体。そのまま配置）
+ * MPA はプロジェクト進行のフレームとして配る。判断基準・思想は原本を読ませる。
+ * 各ツール側のブリッジは原本を参照する薄い1枚にする（原則 P1）。
+ *
+ * 現時点では Claude / Codex 向けに mpa-spec を最小提供する。
+ * Gemini / Generic 向けは新スコープに合わせて再設計予定。
  */
 const BRIDGE_MAP: Record<Tool, { from: string; to: string }[]> = {
   claude: [
-    { from: "templates/skills/mpa/SKILL.md", to: ".claude/skills/mpa/SKILL.md" },
-    { from: "templates/skills/mpa-guard/SKILL.md", to: ".claude/skills/mpa-guard/SKILL.md" },
-    { from: "templates/commands/mpa-check.md", to: ".claude/commands/mpa-check.md" },
-    { from: "templates/commands/mpa-review.md", to: ".claude/commands/mpa-review.md" },
-    { from: "templates/CLAUDE.md", to: "CLAUDE.md" },
-    { from: "templates/hooks/bin/mpa-pre-write.sh", to: ".claude/hooks/bin/mpa-pre-write.sh" },
-    { from: "templates/hooks/bin/mpa-stop-review.sh", to: ".claude/hooks/bin/mpa-stop-review.sh" },
-    // hooks/bin/*.sh は実行ビット 0755 を保って配置する（settings.example.json が
-    // $CLAUDE_PROJECT_DIR/.claude/hooks/bin/*.sh を参照する前提）。
-    { from: "templates/hooks/settings.example.json", to: ".claude/settings.example.json" },
+    { from: "templates/skills/mpa-spec/SKILL.md", to: ".claude/skills/mpa-spec/SKILL.md" },
+    {
+      from: "templates/skills/mpa-spec/agents/gap-finder.md",
+      to: ".claude/skills/mpa-spec/agents/gap-finder.md",
+    },
   ],
   gemini: [
-    { from: "templates/commands/mpa.md", to: ".gemini/commands/mpa.toml" }, // md→toml 変換
-    { from: "templates/commands/mpa-check.md", to: ".gemini/commands/mpa-check.toml" },
-    { from: "templates/commands/mpa-review.md", to: ".gemini/commands/mpa-review.toml" },
-    { from: "templates/GEMINI.md", to: "GEMINI.md" },
+    // 新スコープ向けに再設計予定
   ],
   codex: [
-    { from: "templates/skills/mpa/SKILL.md", to: ".agents/skills/mpa/SKILL.md" },
-    { from: "templates/skills/mpa-guard/SKILL.md", to: ".agents/skills/mpa-guard/SKILL.md" },
-    { from: "templates/AGENTS.md", to: "AGENTS.md" },
+    { from: "templates/skills/mpa-spec/SKILL.md", to: ".agents/skills/mpa-spec/SKILL.md" },
+    {
+      from: "templates/skills/mpa-spec/agents/gap-finder.md",
+      to: ".agents/skills/mpa-spec/agents/gap-finder.md",
+    },
   ],
   generic: [
-    { from: "templates/AGENTS.md", to: "AGENTS.md" },
+    // 新スコープ向けに再設計予定
   ],
 };
 
-/** constitution/ は全ツール共通で必ずそのまま配置（規約の実体） */
-const CONSTITUTION = { from: "constitution", to: "constitution" };
+/**
+ * 全ツール共通で配るブリッジ。
+ *
+ * - templates/github/workflows/   spec lint / TODO 連携の CI ワークフロー。
+ *                                 ロジック本体は npm 上の @monkey-proof/spec-tools を npx で参照する。
+ * - templates/spec/               spec の雛形（README / _template.md / _template.todo.md）。
+ */
+const COMMON_BRIDGES: { from: string; to: string }[] = [
+  { from: "templates/github/workflows/spec-lint.yml", to: ".github/workflows/spec-lint.yml" },
+  { from: "templates/github/workflows/spec-todo-issue.yml", to: ".github/workflows/spec-todo-issue.yml" },
+  { from: "templates/github/workflows/spec-todo-cleanup.yml", to: ".github/workflows/spec-todo-cleanup.yml" },
+  { from: "templates/github/workflows/README.md", to: ".github/workflows/README.md" },
+  { from: "templates/spec/README.md", to: "docs/spec/README.md" },
+  { from: "templates/spec/_template.md", to: "docs/spec/_template.md" },
+  { from: "templates/spec/_template.todo.md", to: "docs/spec/_template.todo.md" },
+];
 
-/** hooks/bin の実行ビットを保つべき配置先（to）の集合 */
-const EXECUTABLE_TARGETS = new Set<string>([
-  ".claude/hooks/bin/mpa-pre-write.sh",
-  ".claude/hooks/bin/mpa-stop-review.sh",
-]);
+/**
+ * 思想と進め方の原本（docs/concepts/）はディレクトリごと配布先の docs/concepts/ に置く。
+ * 配布先でも本物を読ませる前提。
+ */
+const DOCS_CONCEPTS = { from: "docs/concepts", to: "docs/concepts" };
+
+/** 実行ビット 0755 を保つべき配置先（to）の集合。現時点は空。将来 hook 復活時に使う。 */
+const EXECUTABLE_TARGETS = new Set<string>([]);
 
 interface Options {
   target: Target;
@@ -92,7 +103,7 @@ interface PlacementResult {
   status: "created" | "skipped-exists";
 }
 
-const HELP = `create-monkey-proof — MPA を導入する
+const HELP = `create-monkey-proof — MPA をプロジェクトに導入する
 
 使い方:
   npx create-monkey-proof [options]
@@ -106,7 +117,7 @@ options:
 
 例:
   npx create-monkey-proof --tools=claude
-  npx create-monkey-proof --tools=claude,gemini --dir=./my-app
+  npx create-monkey-proof --tools=claude,codex --dir=./my-app
   npx create-monkey-proof --tools=all
 `;
 
@@ -164,10 +175,10 @@ function assertAssets(): void {
   if (!existsSync(ASSETS_DIR)) {
     throw new Error(
       `assets/ が見つかりません: ${ASSETS_DIR}\n` +
-        `配布物が壊れています。npm run build（copy-assets）を実行してから配布してください。`
+        `配布物が壊れています。npm run build（copy-assets）を実行してから配布してください。`,
     );
   }
-  for (const name of ["constitution", "templates"]) {
+  for (const name of ["docs", "templates"]) {
     if (!existsSync(join(ASSETS_DIR, name))) {
       throw new Error(`assets/${name}/ がありません。配布物が不完全です。`);
     }
@@ -175,40 +186,14 @@ function assertAssets(): void {
 }
 
 /**
- * md の frontmatter（description）と本文を、Gemini の command toml へ変換する。
- * Gemini commands は { description, prompt } の toml を期待する。
- */
-function mdToToml(md: string): string {
-  let description = "";
-  let body = md;
-
-  const fm = md.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
-  if (fm) {
-    const front = fm[1];
-    body = fm[2];
-    const descLine = front.match(/^description:\s*(.*)$/m);
-    if (descLine) description = descLine[1].trim();
-  }
-
-  const tomlEscape = (s: string) => s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-  const lines: string[] = [];
-  if (description) lines.push(`description = "${tomlEscape(description)}"`);
-  // 本文は複数行リテラル。toml の """ と衝突しないよう、本文中の """ を退避。
-  const safeBody = body.replace(/"""/g, '\\"\\"\\"');
-  lines.push(`prompt = """\n${safeBody.trim()}\n"""`);
-  return lines.join("\n") + "\n";
-}
-
-/**
  * 1つのブリッジ（from→to）を配置する。
  * - 既存ファイルがあれば作らずスキップ（最小版は上書きしない）
- * - .toml 変換が必要なら mdToToml を通す
  * - 実行ビット対象なら 0755 を付与
  */
 async function placeOne(
   from: string,
   to: string,
-  cwd: string
+  cwd: string,
 ): Promise<PlacementResult> {
   const src = join(ASSETS_DIR, from);
   const dest = join(cwd, to);
@@ -218,13 +203,7 @@ async function placeOne(
   }
 
   await mkdir(dirname(dest), { recursive: true });
-
-  if (to.endsWith(".toml") && from.endsWith(".md")) {
-    const md = await readFile(src, "utf8");
-    await writeFile(dest, mdToToml(md), "utf8");
-  } else {
-    await cp(src, dest);
-  }
+  await cp(src, dest);
 
   if (EXECUTABLE_TARGETS.has(to)) {
     await chmod(dest, 0o755);
@@ -233,20 +212,20 @@ async function placeOne(
   return { to, status: "created" };
 }
 
-/** constitution/ ディレクトリを配置（既存ならスキップ） */
-async function placeConstitution(cwd: string): Promise<PlacementResult> {
-  const dest = join(cwd, CONSTITUTION.to);
+/** docs/concepts/ をディレクトリごと配置（既存ならスキップ） */
+async function placeDocsConcepts(cwd: string): Promise<PlacementResult> {
+  const dest = join(cwd, DOCS_CONCEPTS.to);
   if (existsSync(dest)) {
-    return { to: CONSTITUTION.to + "/", status: "skipped-exists" };
+    return { to: DOCS_CONCEPTS.to + "/", status: "skipped-exists" };
   }
-  await cp(join(ASSETS_DIR, CONSTITUTION.from), dest, { recursive: true });
-  return { to: CONSTITUTION.to + "/", status: "created" };
+  await cp(join(ASSETS_DIR, DOCS_CONCEPTS.from), dest, { recursive: true });
+  return { to: DOCS_CONCEPTS.to + "/", status: "created" };
 }
 
 /** 生成後の sanity check。期待した配置先が実在するか。 */
 async function sanityCheck(
   cwd: string,
-  results: PlacementResult[]
+  results: PlacementResult[],
 ): Promise<string[]> {
   const problems: string[] = [];
   for (const r of results) {
@@ -282,11 +261,15 @@ async function run(opts: Options): Promise<void> {
 
   const results: PlacementResult[] = [];
 
-  // 規約の実体（全ツール共通）
-  results.push(await placeConstitution(opts.cwd));
+  // 思想と進め方の原本（全プロジェクト共通）
+  results.push(await placeDocsConcepts(opts.cwd));
 
-  // 選択ツールごとのブリッジ。重複 to（複数ツールが同じ AGENTS.md 等）は
-  // 既存スキップで自然に1回だけ created になる。
+  // 全ツール共通の workflow と spec 雛形
+  for (const bridge of COMMON_BRIDGES) {
+    results.push(await placeOne(bridge.from, bridge.to, opts.cwd));
+  }
+
+  // 選択ツールごとのブリッジ
   for (const tool of opts.tools) {
     for (const bridge of BRIDGE_MAP[tool]) {
       results.push(await placeOne(bridge.from, bridge.to, opts.cwd));
@@ -313,17 +296,16 @@ async function run(opts: Options): Promise<void> {
 
   // 起動方法の案内
   console.log("導入が完了しました。次の手順:");
-  console.log("  1. constitution/ を読む（MPA の規約の実体）");
+  console.log("  1. docs/concepts/mpa.md を読む（MPA の思想）");
+  console.log("  2. docs/concepts/workflow.md を読む（進め方の骨格）");
   if (opts.tools.includes("claude")) {
-    console.log("  2. Claude Code: /mpa を叩いて作業を開始");
-    console.log("     hooks を有効化する場合は .claude/settings.example.json の hooks ブロックを");
-    console.log("     .claude/settings.json へマージしてください。");
+    console.log("  3. Claude Code: /mpa-spec を叩いて仕様作成を開始");
   }
-  if (opts.tools.includes("gemini")) {
-    console.log("  2. Gemini: /mpa を叩いて作業を開始");
+  if (opts.tools.includes("codex")) {
+    console.log("  3. Codex: mpa-spec スキルを呼び出して仕様作成を開始");
   }
-  if (opts.tools.includes("codex") || opts.tools.includes("generic")) {
-    console.log("  2. AGENTS.md を読ませてから作業を開始");
+  if (opts.tools.includes("gemini") || opts.tools.includes("generic")) {
+    console.log("  3. このツール向けの入口は再設計中です。docs/concepts/ を AI に読ませて作業してください。");
   }
 }
 
@@ -376,10 +358,10 @@ if (isMainModule()) {
 
 export {
   BRIDGE_MAP,
-  CONSTITUTION,
+  COMMON_BRIDGES,
+  DOCS_CONCEPTS,
   HELP,
   parseArgs,
-  mdToToml,
   run,
   type Tool,
   type Target,

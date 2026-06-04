@@ -1,0 +1,40 @@
+name: spec-lint (examples)
+
+# MPA リポジトリ自身のドッグフーディング
+# - 配布物として packages/spec-tools が動くことを examples/spec/ で検証
+# - 配布される spec-lint.yml と同じロジックを使うが、対象は examples/spec/
+# - TODO 起票・クローズ系は走らせない（実 Issue が立つのを避けるため）
+
+on:
+  pull_request:
+    paths:
+      - "examples/spec/**"
+      - "packages/spec-tools/**"
+      - ".github/workflows/spec-lint.yml"
+  push:
+    branches: [main]
+    paths:
+      - "examples/spec/**"
+      - "packages/spec-tools/**"
+
+jobs:
+  spec-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/spec-tools
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: packages/spec-tools/package-lock.json
+
+      - run: npm ci || npm install
+
+      - run: npm run build
+
+      - name: Run spec lint against examples/spec
+        run: node dist/commands/lint.js ../../examples/spec

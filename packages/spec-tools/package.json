@@ -1,0 +1,41 @@
+{
+  "name": "@monkey-proof/spec-tools",
+  "version": "0.1.0",
+  "description": "MPA における仕様の lint / TODO 連携を扱う CLI 群。各プロジェクトの CI から呼ばれる。",
+  "type": "module",
+  "bin": {
+    "mpa-spec-lint": "dist/commands/lint.js",
+    "mpa-spec-todo-issue": "dist/commands/todo-issue.js",
+    "mpa-spec-todo-cleanup": "dist/commands/todo-cleanup.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev:lint": "node --import tsx src/commands/lint.ts",
+    "pretest": "npm run build",
+    "test": "node --import tsx --test test/*.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "monkey-proof",
+    "mpa",
+    "spec",
+    "lint",
+    "ci"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^21.0.0",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.41",
+    "tsx": "^4.0.0",
+    "typescript": "^5.4.0"
+  }
+}

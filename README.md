@@ -1,51 +1,56 @@
-# MPA — Monkey-Proof Architecture
+# 🐵 Monkey-Proof Architecture (MPA)
 
-> Monkey-Proof = foolproof（誰でも間違えない）のもじり。「猿でも壊せない」設計。
+> 規律を内面化していない人間と、規律を持たない AI エージェントの両方が、
+> 「考えなくても」動かして壊れない **プロジェクト進行のフレーム**。
 
-「守れる人」を前提にしないアーキテクチャ規約。
-規律を内面化していない人間（新人・業務委託・将来の自分）と、規律を持たない AI の両方が、
-考えなくても正しい場所に正しいものを置ける。
-
-機械で縛れるもの（依存方向・命名）は機械（lint / 型）で、機械で縛れないもの（例：同じ機能を二度作らない等の意味的判断）は AI で縛る。
-構造は枯れたもの（web=FSD〔Feature-Sliced Design〕 / backend=Clean Architecture×DDD / monorepo）を使い、発明は「強制方法」にだけ置く。
+**現在、コードのアーキテクチャ規約から「プロジェクト進行のフレーム」へとスコープを拡張中**。
+旧スコープのコード規約（旧 `constitution/`）は一旦削除し、上から積み直しています。
+git の履歴には残っています。
 
 ---
 
-## あなたは何をしに来た？
+## まず読む
 
-| 目的 | 行き先 |
-|---|---|
-| 📖 **思想と規約を読みたい** | **[`constitution/`](constitution/README.md)** — 規約のすべてと地図 |
-| 📦 **自分のプロジェクトに導入したい** | `npx create-monkey-proof`（[`packages/create-monkey-proof/`](packages/create-monkey-proof/)）— 対話で AI ツールへ `/mpa` 一式を展開 |
-| 🧪 **規約が効いている実例を見たい** | **[`examples/`](examples/README.md)** — 「いいね」機能の reference 実装（web=FSD / api=CleanArch）と[アンチパターン](examples/anti-patterns/) |
-| 🛠 **MPA 自体を開発したい** | **[`CLAUDE.md`](CLAUDE.md)** — このリポジトリの開発者向け入口 |
+- **[`docs/concepts/mpa.md`](docs/concepts/mpa.md)** — MPA の思想（核）
+- **[`docs/concepts/workflow.md`](docs/concepts/workflow.md)** — プロジェクトの進め方（骨格）
+- **[`docs/concepts/phases/1-spec.md`](docs/concepts/phases/1-spec.md)** — フェーズ1（仕様をつくる）の詳細
 
 ---
 
-## 導入したプロジェクトでの使い方
-
-`npx create-monkey-proof` で導入すると、**作業の入口 `/mpa` が各 AI ツールに展開される。**
-MPA を知らなくても、対話に答えるだけで規約に沿って実装/修正できる。
-
-| ツール | 起動 |
-|---|---|
-| Claude Code | `/mpa` |
-| Gemini CLI | `/mpa` |
-| Codex | `/skills` セレクタ or `$mpa`（`/mpa` 直叩きは環境差あり） |
-| その他（Cursor 等） | `AGENTS.md` を読むツールは、そこから同じ進行表へ案内される |
-
-> どのツール版も規約を複製せず、`constitution/` を参照する薄いブリッジ。
-> 正本（`constitution/` と `templates/`）を直したら `create-monkey-proof` を publish し直すだけで全ツールへ反映される。
-
----
-
-## このリポジトリの構成
+## このリポジトリの構造
 
 ```
-constitution/          唯一の正本。規約の実体（読む人はここ）
-examples/
-  ├── anti-patterns/     規約違反の見本（読み物）
-  └── demo/              動くデモ = 規約が効いている証拠。CI の検証対象
-templates/             create-monkey-proof が各プロジェクトに配る素材一式
-packages/create-monkey-proof/   導入機構。npx create-monkey-proof の実装
+monkey-proof-architecture/
+├── docs/
+│   ├── concepts/          MPA の思想と進め方の原本（配布される）
+│   │   ├── mpa.md
+│   │   ├── workflow.md
+│   │   └── phases/
+│   └── design-notes/      設計の議論ログ（草案）
+├── templates/             配布素材
+│   ├── spec/              spec の雛形・ディレクトリ規約
+│   ├── github/workflows/  CI ワークフロー（spec lint / TODO 連携）
+│   └── skills/mpa-spec/   仕様作成スキル（各 AI ツール向け）
+├── examples/spec/         「投稿にいいねする」を題材にした仕様の例
+└── packages/
+    ├── create-monkey-proof/   配布機構（npx create-monkey-proof）
+    └── spec-tools/            CI 用 CLI（@monkey-proof/spec-tools）
 ```
+
+---
+
+## 導入
+
+```bash
+npx create-monkey-proof --tools=claude
+```
+
+詳細は [`packages/create-monkey-proof/`](packages/create-monkey-proof/) を参照。
+
+---
+
+## 開発者向け（このリポ自身で作業する人）
+
+- 思想と進め方を読む（[`docs/concepts/`](docs/concepts/)）
+- spec の例を読む（[`examples/spec/`](examples/spec/)）
+- CI 用 CLI のテスト（[`packages/spec-tools/`](packages/spec-tools/)）
