@@ -1,0 +1,45 @@
+name: spec-todo-issue
+
+# MPA フェーズ1: TODO → GitHub Issue 自動起票
+#
+# - main へのマージ後、docs/spec/ 配下の `.todo.md` に新規 TD があれば Issue を起票
+# - 起票後、issue 番号を `.todo.md` に書き戻して自動 commit
+# - Projects への自動連携は GitHub Projects 側の workflow ルールで設定する
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/spec/**/*.todo.md"
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  todo-to-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Open issues for new TODO entries
+        run: npx --yes @monkey-proof/spec-tools mpa-spec-todo-issue docs/spec
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
+      - name: Commit issue numbers back to TODO files
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A docs/spec
+            git commit -m "chore(spec): backfill issue numbers into TODO files"
+            git push
+          fi

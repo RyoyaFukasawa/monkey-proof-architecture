@@ -56,7 +56,12 @@ test("E2E: symlink(.bin)経由で起動しても MPA が展開される（npx経
     assert.match(stdout, /配置:/);
 
     // 実ファイルが展開されていること
-    for (const rel of ["constitution/00-principles.md", ".claude/skills/mpa/SKILL.md", "CLAUDE.md"]) {
+    for (const rel of [
+      "docs/concepts/mpa.md",
+      "docs/spec/_template.md",
+      ".github/workflows/spec-lint.yml",
+      ".claude/skills/mpa-spec/SKILL.md",
+    ]) {
       assert.ok(existsSync(join(dest, rel)), `展開されていない: ${rel}`);
     }
   } finally {
@@ -75,6 +80,6 @@ test("E2E: 不正な引数は exit 2 で終わる", async () => {
     (err: NodeJS.ErrnoException & { code?: number }) => {
       assert.equal((err as unknown as { code: number }).code, 2);
       return true;
-    }
+    },
   );
 });

@@ -1,0 +1,41 @@
+name: spec-todo-cleanup
+
+# MPA フェーズ1: Issue クローズ → TODO エントリの自動削除
+#
+# - spec-todo ラベルが付いた Issue が close されたら、対応する TD を `.todo.md` から削除
+# - TODO ファイルが空になったらファイル自体を削除
+# - TODO が解決した spec は次のステップで `status: accepted` に上げられる
+
+on:
+  issues:
+    types: [closed]
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'spec-todo')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Remove resolved TODO entry
+        run: npx --yes @monkey-proof/spec-tools mpa-spec-todo-cleanup docs/spec ${{ github.event.issue.number }}
+
+      - name: Commit cleanup
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A docs/spec
+            git commit -m "chore(spec): remove TODO closed by issue #${{ github.event.issue.number }}"
+            git push
+          fi

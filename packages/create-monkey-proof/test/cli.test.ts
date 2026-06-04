@@ -8,12 +8,12 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, rm, readFile, stat } from "node:fs/promises";
+import { mkdtemp, rm, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { parseArgs, mdToToml, run } from "../src/cli.ts";
+import { parseArgs, run } from "../src/cli.ts";
 
 // run() は進捗を console.log するので、テスト中は黙らせる。
 function silence<T>(fn: () => Promise<T>): Promise<T> {
@@ -49,9 +49,9 @@ test("parseArgs: --tools=all は全ツール", () => {
 });
 
 test("parseArgs: --tools の重複は除去・順序保持", () => {
-  const opts = parseArgs(["--tools=gemini,claude,gemini"]);
+  const opts = parseArgs(["--tools=codex,claude,codex"]);
   if (opts === "help") throw new Error("unexpected help");
-  assert.deepEqual(opts.tools, ["gemini", "claude"]);
+  assert.deepEqual(opts.tools, ["codex", "claude"]);
 });
 
 test("parseArgs: 未知のツールは例外", () => {
@@ -66,60 +66,51 @@ test("parseArgs: 未知の引数は例外", () => {
   assert.throws(() => parseArgs(["--nope"]), /未知の引数/);
 });
 
-// ---- mdToToml ----
-
-test("mdToToml: frontmatter の description を toml キーに、本文を prompt に", () => {
-  const md = "---\ndescription: テスト用\n---\n# 本文\n\nここ。\n";
-  const toml = mdToToml(md);
-  assert.match(toml, /^description = "テスト用"/m);
-  assert.match(toml, /prompt = """/);
-  assert.match(toml, /# 本文/);
-});
-
-test("mdToToml: description の \" はエスケープされる", () => {
-  const md = '---\ndescription: a"b\n---\nbody\n';
-  const toml = mdToToml(md);
-  assert.match(toml, /description = "a\\"b"/);
-});
-
-test("mdToToml: frontmatter が無くても本文は prompt に入る", () => {
-  const toml = mdToToml("# no front\n");
-  assert.doesNotMatch(toml, /^description =/m);
-  assert.match(toml, /prompt = """[\s\S]*# no front/);
-});
-
 // ---- run（統合：実際に /tmp へ展開）----
 
-test("run: claude+gemini を展開し、期待ファイルが揃う", async () => {
+test("run: claude を展開し、思想・spec 雛形・workflow・mpa-spec スキルが揃う", async () => {
   const dir = await mkdtemp(join(tmpdir(), "mpa-test-"));
   try {
     await silence(() =>
-      run({ target: "new", tools: ["claude", "gemini"], cwd: dir })
+      run({ target: "new", tools: ["claude"], cwd: dir }),
     );
 
-    // 主要ファイルの実在
     const expected = [
-      "constitution/00-principles.md",
-      ".claude/skills/mpa/SKILL.md",
-      ".claude/commands/mpa-check.md",
-      "CLAUDE.md",
-      ".claude/hooks/bin/mpa-pre-write.sh",
-      ".claude/settings.example.json",
-      ".gemini/commands/mpa.toml",
-      "GEMINI.md",
+      // 思想
+      "docs/concepts/mpa.md",
+      "docs/concepts/workflow.md",
+      "docs/concepts/phases/1-spec.md",
+      // spec 雛形
+      "docs/spec/README.md",
+      "docs/spec/_template.md",
+      "docs/spec/_template.todo.md",
+      // workflow
+      ".github/workflows/spec-lint.yml",
+      ".github/workflows/spec-todo-issue.yml",
+      ".github/workflows/spec-todo-cleanup.yml",
+      // claude 向けスキル
+      ".claude/skills/mpa-spec/SKILL.md",
+      ".claude/skills/mpa-spec/agents/gap-finder.md",
     ];
     for (const rel of expected) {
       assert.ok(existsSync(join(dir, rel)), `missing: ${rel}`);
     }
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
 
-    // hook の実行ビット
-    const st = await stat(join(dir, ".claude/hooks/bin/mpa-pre-write.sh"));
-    assert.ok(st.mode & 0o111, "hook に実行ビットが立っていない");
+test("run: codex で .agents/skills/mpa-spec が配置される", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "mpa-test-"));
+  try {
+    await silence(() =>
+      run({ target: "new", tools: ["codex"], cwd: dir }),
+    );
 
-    // toml 変換結果
-    const toml = await readFile(join(dir, ".gemini/commands/mpa-check.toml"), "utf8");
-    assert.match(toml, /^description = ".+"/m);
-    assert.match(toml, /prompt = """/);
+    assert.ok(existsSync(join(dir, ".agents/skills/mpa-spec/SKILL.md")));
+    assert.ok(
+      existsSync(join(dir, ".agents/skills/mpa-spec/agents/gap-finder.md")),
+    );
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
@@ -131,19 +122,23 @@ test("run: 既存ファイルは上書きせずスキップ（冪等・再実行
     // 1回目: claude
     await silence(() => run({ target: "new", tools: ["claude"], cwd: dir }));
 
-    // CLAUDE.md を手で書き換える → 2回目で上書きされないことを確認
-    const claudeMd = join(dir, "CLAUDE.md");
+    // SKILL.md を手で書き換える → 2回目で上書きされないことを確認
+    const skillPath = join(dir, ".claude/skills/mpa-spec/SKILL.md");
     const marker = "<!-- user-edited -->";
-    const before = await readFile(claudeMd, "utf8");
-    await rm(claudeMd);
-    await (await import("node:fs/promises")).writeFile(claudeMd, before + marker);
+    const before = await readFile(skillPath, "utf8");
+    await writeFile(skillPath, before + marker);
 
-    // 2回目: codex 追加（AGENTS.md は新規、CLAUDE.md は既存スキップのはず）
-    await silence(() => run({ target: "new", tools: ["claude", "codex"], cwd: dir }));
+    // 2回目: claude + codex（codex 分は新規、claude 分は既存スキップ）
+    await silence(() =>
+      run({ target: "new", tools: ["claude", "codex"], cwd: dir }),
+    );
 
-    const after = await readFile(claudeMd, "utf8");
-    assert.ok(after.includes(marker), "既存 CLAUDE.md が上書きされてしまった");
-    assert.ok(existsSync(join(dir, "AGENTS.md")), "codex 分の AGENTS.md が作られていない");
+    const after = await readFile(skillPath, "utf8");
+    assert.ok(after.includes(marker), "既存 SKILL.md が上書きされてしまった");
+    assert.ok(
+      existsSync(join(dir, ".agents/skills/mpa-spec/SKILL.md")),
+      "codex 分のスキルが作られていない",
+    );
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

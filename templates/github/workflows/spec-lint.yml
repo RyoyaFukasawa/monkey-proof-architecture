@@ -1,0 +1,30 @@
+name: spec-lint
+
+# MPA フェーズ1: 仕様 lint
+#
+# - docs/spec/ 配下の spec / TODO を検証
+# - 違反があれば CI が落ちる（マージできない）
+# - これは原則 P2「機械で縛れるものは必ず機械で縛る」の実装
+
+on:
+  pull_request:
+    paths:
+      - "docs/spec/**"
+      - ".github/workflows/spec-lint.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/spec/**"
+
+jobs:
+  spec-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run spec lint
+        run: npx --yes @monkey-proof/spec-tools mpa-spec-lint docs/spec
